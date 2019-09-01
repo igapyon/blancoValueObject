@@ -41,7 +41,7 @@ public class BlancoValueObjectFieldStructure {
      * アノテーション文字列です（＠は除く）
      *
      * フィールド: [annotationList]。
-     * デフォルト: [new java.util.ArrayList<java.lang.String>()]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
      */
     private List<java.lang.String> fAnnotationList = new java.util.ArrayList<java.lang.String>();
 
@@ -63,7 +63,7 @@ public class BlancoValueObjectFieldStructure {
      * フィールドの補助説明です。文字参照エンコード済みの値を格納してください。
      *
      * フィールド: [descriptionList]。
-     * デフォルト: [new java.util.ArrayList<java.lang.String>()]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
      */
     private List<java.lang.String> fDescriptionList = new java.util.ArrayList<java.lang.String>();
 
@@ -212,7 +212,7 @@ public class BlancoValueObjectFieldStructure {
      * フィールド [annotationList] の値を取得します。
      *
      * フィールドの説明: [アノテーション文字列です（＠は除く）]。
-     * デフォルト: [new java.util.ArrayList<java.lang.String>()]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
      *
      * @return フィールド[annotationList]から取得した値。
      */
@@ -279,7 +279,7 @@ public class BlancoValueObjectFieldStructure {
      * フィールド [descriptionList] の値を取得します。
      *
      * フィールドの説明: [フィールドの補助説明です。文字参照エンコード済みの値を格納してください。]。
-     * デフォルト: [new java.util.ArrayList<java.lang.String>()]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
      *
      * @return フィールド[descriptionList]から取得した値。
      */
@@ -450,5 +450,83 @@ public class BlancoValueObjectFieldStructure {
         buf.append(",maxInclusive=" + fMaxInclusive);
         buf.append("]");
         return buf.toString();
+    }
+
+    /**
+     * このバリューオブジェクトを指定のターゲットに複写します。
+     *
+     * <P>使用上の注意</P>
+     * <UL>
+     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
+     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * </UL>
+     *
+     * @param target target value object.
+     */
+    public void copyTo(final BlancoValueObjectFieldStructure target) {
+        if (target == null) {
+            throw new IllegalArgumentException("Bug: BlancoValueObjectFieldStructure#copyTo(target): argument 'target' is null");
+        }
+
+        // No needs to copy parent class.
+
+        // Name: fNo
+        // Type: java.lang.String
+        target.fNo = this.fNo;
+        // Name: fName
+        // Type: java.lang.String
+        target.fName = this.fName;
+        // Name: fType
+        // Type: java.lang.String
+        target.fType = this.fType;
+        // Name: fGeneric
+        // Type: java.lang.String
+        target.fGeneric = this.fGeneric;
+        // Name: fAnnotationList
+        // Type: java.util.List
+        if (this.fAnnotationList != null) {
+            final java.util.Iterator<java.lang.String> iterator = this.fAnnotationList.iterator();
+            for (; iterator.hasNext();) {
+                java.lang.String loopSource = iterator.next();
+                java.lang.String loopTarget = null;
+                loopTarget = loopSource;
+                target.fAnnotationList.add(loopTarget);
+            }
+        }
+        // Name: fDefault
+        // Type: java.lang.String
+        target.fDefault = this.fDefault;
+        // Name: fDescription
+        // Type: java.lang.String
+        target.fDescription = this.fDescription;
+        // Name: fDescriptionList
+        // Type: java.util.List
+        if (this.fDescriptionList != null) {
+            final java.util.Iterator<java.lang.String> iterator = this.fDescriptionList.iterator();
+            for (; iterator.hasNext();) {
+                java.lang.String loopSource = iterator.next();
+                java.lang.String loopTarget = null;
+                loopTarget = loopSource;
+                target.fDescriptionList.add(loopTarget);
+            }
+        }
+        // Name: fPattern
+        // Type: java.lang.String
+        target.fPattern = this.fPattern;
+        // Name: fMinLength
+        // Type: java.lang.String
+        target.fMinLength = this.fMinLength;
+        // Name: fMaxLength
+        // Type: java.lang.String
+        target.fMaxLength = this.fMaxLength;
+        // Name: fLength
+        // Type: java.lang.String
+        target.fLength = this.fLength;
+        // Name: fMinInclusive
+        // Type: java.lang.String
+        target.fMinInclusive = this.fMinInclusive;
+        // Name: fMaxInclusive
+        // Type: java.lang.String
+        target.fMaxInclusive = this.fMaxInclusive;
     }
 }
