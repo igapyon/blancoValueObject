@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="blancoValueObject" default="build" basedir=".">
 	<!-- blancoAnt(0.2.1)により自動生成されました。 (2010/12/22) -->
-	<property name="version" value="2.0.3" />
+	<xmlproperty file="pom.xml" prefix="maven" />
+	<property name="version" value="${maven.project.version}" />
 
 	<property name="project" value="blancoValueObject" />
 	<property name="project.lower" value="blancovalueobject" />
@@ -9,51 +10,64 @@
 	<property name="project.main.jar" value="blancovalueobject-${version}.jar" />
 
 	<property name="encoding" value="UTF-8" />
+    <property name="maven.repo.local" value="${user.home}/.m2/repository" />
+    <property name="blanco.beanutils.repository.url" value="${maven.project.properties.blanco.beanutils.repository.url}" />
+	<property environment="env" />
+	<condition property="maven.opts" value="${env.MAVEN_OPTS} -Djava.net.preferIPv4Stack=true">
+		<isset property="env.MAVEN_OPTS" />
+	</condition>
+	<property name="maven.opts" value="-Djava.net.preferIPv4Stack=true" />
 	<!-- property name="eclipse.dir" value="C:/Program Files/eclipse" / -->
 
-	<!-- Antタスク定義 begin -->
-	<taskdef name="blancoanttask" classname="blanco.anttask.task.BlancoAntTaskTask">
-		<classpath>
-			<fileset dir="lib" includes="*.jar" />
-			<fileset dir="lib.ant" includes="*.jar" />
-		</classpath>
-	</taskdef>
+	<!-- Resolve Maven dependencies before loading the generator Ant tasks. -->
+	<target name="resolve-dependencies">
+		<delete dir="target/lib" />
+		<mkdir dir="target/lib" />
+		<exec executable="mvn" failonerror="true">
+			<env key="MAVEN_OPTS" value="${maven.opts}" />
+			<arg value="-f" /><arg value="pom.xml" />
+            <arg value="-Dmaven.repo.local=${maven.repo.local}" />
+            <arg value="-Dblanco.beanutils.repository.url=${blanco.beanutils.repository.url}" />
+			<arg value="dependency:copy-dependencies" />
+			<arg value="-DoutputDirectory=target/lib" />
+            <arg value="-DincludeScope=runtime" />
+		</exec>
+	</target>
 
-	<taskdef name="blancoconstants" classname="blanco.constants.task.BlancoConstantsTask">
-		<classpath>
-			<fileset dir="lib" includes="*.jar" />
-			<fileset dir="lib.ant" includes="*.jar" />
-		</classpath>
-	</taskdef>
-
-	<taskdef name="blancomessage" classname="blanco.message.task.BlancoMessageTask">
-		<classpath>
-			<fileset dir="lib" includes="*.jar" />
-			<fileset dir="lib.ant" includes="*.jar" />
-		</classpath>
-	</taskdef>
-
-	<taskdef name="blancometa2xml" classname="blanco.meta2xml.task.BlancoMeta2XmlTask">
-		<classpath>
-			<fileset dir="lib" includes="*.jar" />
-			<fileset dir="lib.ant" includes="*.jar" />
-		</classpath>
-	</taskdef>
-
-	<taskdef name="blancoresourcebundle" classname="blanco.resourcebundle.task.BlancoResourceBundleTask">
-		<classpath>
-			<fileset dir="lib" includes="*.jar" />
-			<fileset dir="lib.ant" includes="*.jar" />
-		</classpath>
-	</taskdef>
-
-	<taskdef name="blancovalueobject" classname="blanco.valueobject.task.BlancoValueObjectTask" classpath="bin:src">
-		<classpath>
-			<fileset dir="lib" includes="*.jar" excludes="blancovalueobject-1.2.0.jar" />
-		</classpath>
-	</taskdef>
-
-	<!-- Antタスク定義 end -->
+	<target name="init" depends="resolve-dependencies">
+		<taskdef name="blancoanttask" classname="blanco.anttask.task.BlancoAntTaskTask">
+			<classpath>
+				<fileset dir="target/lib" includes="*.jar" />
+			</classpath>
+		</taskdef>
+		<taskdef name="blancoconstants" classname="blanco.constants.task.BlancoConstantsTask">
+			<classpath>
+				<fileset dir="target/lib" includes="*.jar" />
+			</classpath>
+		</taskdef>
+		<taskdef name="blancomessage" classname="blanco.message.task.BlancoMessageTask">
+			<classpath>
+				<fileset dir="target/lib" includes="*.jar" />
+			</classpath>
+		</taskdef>
+		<taskdef name="blancometa2xml" classname="blanco.meta2xml.task.BlancoMeta2XmlTask">
+			<classpath>
+				<fileset dir="target/lib" includes="*.jar" />
+			</classpath>
+		</taskdef>
+		<taskdef name="blancoresourcebundle" classname="blanco.resourcebundle.task.BlancoResourceBundleTask">
+			<classpath>
+				<fileset dir="target/lib" includes="*.jar" />
+			</classpath>
+		</taskdef>
+		<taskdef name="blancovalueobject" classname="blanco.valueobject.task.BlancoValueObjectTask">
+			<classpath>
+				<pathelement location="bin" />
+				<pathelement location="src" />
+				<fileset dir="target/lib" includes="*.jar" />
+			</classpath>
+		</taskdef>
+	</target>
 
 	<!-- 自分自身のAntタスク。 -->
 	<!-- 不要 -->
@@ -68,18 +82,18 @@
 
 		<copy todir="lib.ant">
 			<fileset dir=".">
-				<include name="${project.lower}-*.jar" />
+				<include name="${project.main.jar}" />
 			</fileset>
 		</copy>
 
 		<delete>
 			<fileset dir=".">
-				<include name="${project.lower}-*.jar" />
+				<include name="${project.main.jar}" />
 			</fileset>
 		</delete>
 
 		<zip destfile="${project.zip}">
-			<zipfileset dir="." prefix="${project}" excludes="${project.zip},**/*.class" />
+			<zipfileset dir="." prefix="${project}" excludes="${project.zip},**/*.class,target/**,workplace/**,release-assets/**,lib.ant/**,${project.lower}-*.jar" />
 		</zip>
 
 	</target>
@@ -88,7 +102,7 @@
 		<echo>building jar</echo>
 
 		<!-- 定義書読込設定XMLファイル(blancoCalcParserが利用) をコピーします。 -->
-		<copy file="src/blanco/valueobject/BlancoValueObjectMeta2Xml.xml" todir="bin/blanco/valueobject" />
+		<copy file="src/main/resources/blanco/valueobject/BlancoValueObjectMeta2Xml.xml" todir="bin/blanco/valueobject" />
 
 		<delete file="${project.main.jar}" />
 		<jar destfile="${project.main.jar}">
@@ -106,44 +120,52 @@
 		</jar>
 	</target>
 
-	<target name="compile">
+	<target name="compile" depends="init">
 		<delete dir="bin" />
 		<mkdir dir="bin" />
-		<javac destdir="bin" debug="true" source="1.7" target="1.7" fork="false" encoding="${encoding}">
+		<javac destdir="bin" debug="true" release="8" includeantruntime="false" fork="false" encoding="${encoding}">
 			<src path="blanco/main/" />
-			<src path="src/" />
+			<src path="src/main/java/" />
 			<classpath>
 				<!-- ワイルドカードで一括取り込み -->
-				<fileset dir="lib" includes="*.jar" />
+				<fileset dir="target/lib" includes="*.jar" />
 				<!-- pathelement path="${eclipse.dir}/plugins/org.junit_3.8.2.v20080602-1318/junit.jar" / -->
 			</classpath>
 			<include name="**/*.java" />
+			<exclude name="blanco/sample/**/*" />
 		</javac>
 	</target>
 
-	<target name="javadoc">
+	<target name="javadoc" depends="init">
 		<echo>JavaDocを生成します。</echo>
 		<delete dir="javadoc" />
 		<javadoc destdir="javadoc" encoding="${encoding}">
 			<fileset dir="src" includes="**/*.java" />
 			<fileset dir="blanco/main" includes="**/*.java" />
 			<classpath>
-				<fileset dir="lib" includes="*.jar" />
-				<fileset dir="lib.ant" includes="*.jar" />
+				<fileset dir="target/lib" includes="*.jar" />
+				<fileset dir="target/lib" includes="*.jar" />
 			</classpath>
 		</javadoc>
 	</target>
 
 	<target name="meta.clean">
 		<delete>
-			<fileset dir="blanco/main">
+			<fileset dir="blanco/main" erroronmissingdir="false">
 				<include name="**/*.java" />
 				<include name="**/*.properties" />
 			</fileset>
 		</delete>
 	</target>
 
-	<target name="meta">
+    <!-- Definition workbooks retain historical versions; POM is authoritative. -->
+    <target name="stamp-version">
+        <replaceregexp file="blanco/main/blanco/valueobject/BlancoValueObjectConstants.java"
+            match='(public static final String VERSION = )"[^"]*";'
+            replace='\1"${version}";' byline="true" encoding="UTF-8" />
+    </target>
+
+	<target name="meta" depends="init">
 		<blancoanttask metadir="meta/program" encoding="${encoding}" />
 		<blancoconstants metadir="meta/program" encoding="${encoding}" />
 		<blancomessage metadir="meta/program" encoding="${encoding}" />
@@ -151,6 +173,8 @@
 		<blancoresourcebundle metadir="meta/program" commenttimestamp="false" encoding="${encoding}" />
 		<blancovalueobject metadir="meta/program" encoding="${encoding}" sheetType="php"/>
 		<blancovalueobject metadir="meta/objects" encoding="${encoding}" sheetType="php"/>
+
+        <antcall target="stamp-version" />
 
 		<!-- TODO: ここに自身のantタスクを追加してください。 -->
 	</target>
