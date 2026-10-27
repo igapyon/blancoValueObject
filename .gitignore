@@ -6,9 +6,15 @@
 *.iml
 /blancoValueObject-*-src.zip
 /bin/
+/blanco/main/
 /tmp/
 /tmpTest/
 /sample/
 /target/
 /classes
+/workplace/
 ~$*
+
+/lib.ant/
+/release-assets/
+/blancovalueobject-*.jar
